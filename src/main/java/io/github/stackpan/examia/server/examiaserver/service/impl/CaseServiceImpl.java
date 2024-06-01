@@ -1,12 +1,12 @@
 package io.github.stackpan.examia.server.examiaserver.service.impl;
 
-import io.github.stackpan.examia.server.examiaserver.entity.CaseEntity;
-import io.github.stackpan.examia.server.examiaserver.entity.UserEntity;
-import io.github.stackpan.examia.server.examiaserver.model.NewCase;
+import io.github.stackpan.examia.server.examiaserver.entity.Case;
+import io.github.stackpan.examia.server.examiaserver.entity.User;
+import io.github.stackpan.examia.server.examiaserver.http.request.CreateCaseRequest;
 import io.github.stackpan.examia.server.examiaserver.repository.CaseRepository;
 import io.github.stackpan.examia.server.examiaserver.repository.UserRepository;
 import io.github.stackpan.examia.server.examiaserver.service.CaseService;
-import io.github.stackpan.examia.server.examiaserver.model.Case;
+import io.github.stackpan.examia.server.examiaserver.http.resource.CaseResource;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -25,25 +25,25 @@ public class CaseServiceImpl implements CaseService {
     private final UserRepository userRepository;
 
     @Override
-    public List<Case> getAll() {
-        var caseEntities = (List<CaseEntity>) caseRepository.findAll();
+    public List<CaseResource> getAll() {
+        var caseEntities = (List<Case>) caseRepository.findAll();
 
         return caseEntities.stream()
-                .map(Case::fromEntity)
+                .map(CaseResource::fromEntity)
                 .toList();
     }
 
     @Override
-    public Case getById(UUID id) {
+    public CaseResource getById(UUID id) {
         var caseEntity = findByIdOrThrow(id);
 
-        return Case.fromEntity(caseEntity);
+        return CaseResource.fromEntity(caseEntity);
     }
 
     @Override
     @Transactional
-    public Case create(NewCase model) {
-        var caseEntity = new CaseEntity();
+    public CaseResource create(CreateCaseRequest model) {
+        var caseEntity = new Case();
 
         caseEntity.setTitle(model.title());
         caseEntity.setDescription(model.description());
@@ -52,12 +52,12 @@ public class CaseServiceImpl implements CaseService {
 
         caseRepository.save(caseEntity);
 
-        return Case.fromEntity(caseEntity);
+        return CaseResource.fromEntity(caseEntity);
     }
 
     @Override
     @Transactional
-    public void updateById(UUID id, NewCase model) {
+    public void updateById(UUID id, CreateCaseRequest model) {
         var caseEntity = findByIdOrThrow(id);
 
         caseEntity.setTitle(model.title());
@@ -77,15 +77,15 @@ public class CaseServiceImpl implements CaseService {
         caseRepository.deleteById(id);
     }
 
-    private CaseEntity findByIdOrThrow(UUID id) {
+    private Case findByIdOrThrow(UUID id) {
         return caseRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
 
-    private UserEntity createUser() {
+    private User createUser() {
         return userRepository.findByUsername("john_doe")
                 .orElseGet(() -> {
-                    var newUser = new UserEntity();
+                    var newUser = new User();
                     newUser.setUsername("john_doe");
                     newUser.setEmail("johndoe@example.com");
                     newUser.setFirstName("John");

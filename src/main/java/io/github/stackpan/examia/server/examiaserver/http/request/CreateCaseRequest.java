@@ -1,8 +1,8 @@
-package io.github.stackpan.examia.server.examiaserver.model;
+package io.github.stackpan.examia.server.examiaserver.http.request;
 
 import jakarta.validation.constraints.*;
 
-public record NewCase(
+public record CreateCaseRequest(
         @NotNull @Size(max = 50) String title,
         @Size(max = 500) String description,
         @NotNull @Min(0) Integer durationInSeconds

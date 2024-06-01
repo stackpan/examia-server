@@ -1,10 +1,10 @@
-package io.github.stackpan.examia.server.examiaserver.model;
+package io.github.stackpan.examia.server.examiaserver.http.resource;
 
-import io.github.stackpan.examia.server.examiaserver.entity.UserEntity;
+import io.github.stackpan.examia.server.examiaserver.entity.User;
 
 import java.util.UUID;
 
-public record CaseOwner(
+public record CaseOwnerResource(
         UUID id,
         String username,
         String email,
@@ -12,8 +12,8 @@ public record CaseOwner(
         String lastName
 ) {
 
-    public static CaseOwner fromEntity(UserEntity entity) {
-        return new CaseOwner(
+    public static CaseOwnerResource fromEntity(User entity) {
+        return new CaseOwnerResource(
                 entity.getId(),
                 entity.getUsername(),
                 entity.getEmail(),

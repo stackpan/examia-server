@@ -1,8 +1,8 @@
-package io.github.stackpan.examia.server.examiaserver.controller;
+package io.github.stackpan.examia.server.examiaserver.http.controller;
 
 import io.github.stackpan.examia.server.examiaserver.assembler.CaseModelAssembler;
-import io.github.stackpan.examia.server.examiaserver.model.Case;
-import io.github.stackpan.examia.server.examiaserver.model.NewCase;
+import io.github.stackpan.examia.server.examiaserver.http.resource.CaseResource;
+import io.github.stackpan.examia.server.examiaserver.http.request.CreateCaseRequest;
 import io.github.stackpan.examia.server.examiaserver.service.CaseService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +27,7 @@ public class CaseController {
     private final CaseModelAssembler caseModelAssembler;
 
     @GetMapping
-    public CollectionModel<EntityModel<Case>> listCases() {
+    public CollectionModel<EntityModel<CaseResource>> listCases() {
         var cases = caseService.getAll().stream()
                 .map(caseModelAssembler::toModel)
                 .toList();
@@ -36,7 +36,7 @@ public class CaseController {
     }
 
     @PostMapping
-    public ResponseEntity<EntityModel<Case>> createCase(@RequestBody @Valid NewCase request) {
+    public ResponseEntity<EntityModel<CaseResource>> createCase(@RequestBody @Valid CreateCaseRequest request) {
         var created = caseService.create(request);
 
         var entityModel = caseModelAssembler.toModel(created);
@@ -47,14 +47,14 @@ public class CaseController {
     }
 
     @GetMapping("/{caseId}")
-    public EntityModel<Case> getCase(@PathVariable String caseId) {
+    public EntityModel<CaseResource> getCase(@PathVariable String caseId) {
         var aCase = caseService.getById(UUID.fromString(caseId));
 
         return caseModelAssembler.toModel(aCase);
     }
 
     @PutMapping("/{caseId}")
-    public ResponseEntity<Void> updateCase(@PathVariable String caseId, @RequestBody @Valid NewCase request) {
+    public ResponseEntity<Void> updateCase(@PathVariable String caseId, @RequestBody @Valid CreateCaseRequest request) {
         caseService.updateById(UUID.fromString(caseId), request);
 
         return ResponseEntity.noContent().build();

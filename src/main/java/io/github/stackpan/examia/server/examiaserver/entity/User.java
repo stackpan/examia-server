@@ -16,7 +16,7 @@ import java.time.OffsetDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-public class UserEntity implements Serializable {
+public class User implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -48,6 +48,6 @@ public class UserEntity implements Serializable {
     private boolean isSoftDeleted = false;
 
     @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
-    private List<CaseEntity> cases = new ArrayList<>();
+    private List<Case> cases = new ArrayList<>();
 
 }

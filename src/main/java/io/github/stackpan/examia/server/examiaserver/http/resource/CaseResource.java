@@ -1,27 +1,27 @@
-package io.github.stackpan.examia.server.examiaserver.model;
+package io.github.stackpan.examia.server.examiaserver.http.resource;
 
-import io.github.stackpan.examia.server.examiaserver.entity.CaseEntity;
+import io.github.stackpan.examia.server.examiaserver.entity.Case;
 
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
-public record Case(
+public record CaseResource(
         UUID id,
         String title,
         String description,
         Integer durationInSeconds,
-        CaseOwner owner,
+        CaseOwnerResource owner,
         OffsetDateTime createdAt,
         OffsetDateTime updatedAt
 ) {
 
-    public static Case fromEntity(CaseEntity entity) {
-        return new Case(
+    public static CaseResource fromEntity(Case entity) {
+        return new CaseResource(
                 entity.getId(),
                 entity.getTitle(),
                 entity.getDescription(),
                 entity.getDurationInSeconds(),
-                CaseOwner.fromEntity(entity.getOwner()),
+                CaseOwnerResource.fromEntity(entity.getOwner()),
                 entity.getCreatedAt(),
                 entity.getUpdatedAt()
         );

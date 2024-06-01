@@ -1,20 +1,20 @@
 package io.github.stackpan.examia.server.examiaserver.service;
 
-import io.github.stackpan.examia.server.examiaserver.model.Case;
-import io.github.stackpan.examia.server.examiaserver.model.NewCase;
+import io.github.stackpan.examia.server.examiaserver.http.resource.CaseResource;
+import io.github.stackpan.examia.server.examiaserver.http.request.CreateCaseRequest;
 
 import java.util.List;
 import java.util.UUID;
 
 public interface CaseService {
 
-    List<Case> getAll();
+    List<CaseResource> getAll();
 
-    Case getById(UUID id);
+    CaseResource getById(UUID id);
 
-    Case create(NewCase model);
+    CaseResource create(CreateCaseRequest model);
 
-    void updateById(UUID id, NewCase model);
+    void updateById(UUID id, CreateCaseRequest model);
 
     void deleteById(UUID id);
 
