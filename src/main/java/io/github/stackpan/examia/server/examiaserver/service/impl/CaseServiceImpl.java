@@ -6,14 +6,14 @@ import io.github.stackpan.examia.server.examiaserver.http.request.CreateCaseRequ
 import io.github.stackpan.examia.server.examiaserver.repository.CaseRepository;
 import io.github.stackpan.examia.server.examiaserver.repository.UserRepository;
 import io.github.stackpan.examia.server.examiaserver.service.CaseService;
-import io.github.stackpan.examia.server.examiaserver.http.resource.CaseResource;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -25,46 +25,40 @@ public class CaseServiceImpl implements CaseService {
     private final UserRepository userRepository;
 
     @Override
-    public List<CaseResource> getAll() {
-        var caseEntities = (List<Case>) caseRepository.findAll();
-
-        return caseEntities.stream()
-                .map(CaseResource::fromEntity)
-                .toList();
+    public Page<Case> getAll(Pageable pageable) {
+        return caseRepository.findAll(pageable);
     }
 
     @Override
-    public CaseResource getById(UUID id) {
-        var caseEntity = findByIdOrThrow(id);
-
-        return CaseResource.fromEntity(caseEntity);
+    public Case getById(UUID id) {
+        return findByIdOrThrow(id);
     }
 
     @Override
     @Transactional
-    public CaseResource create(CreateCaseRequest model) {
-        var caseEntity = new Case();
+    public Case create(CreateCaseRequest data) {
+        var aCase = new Case();
 
-        caseEntity.setTitle(model.title());
-        caseEntity.setDescription(model.description());
-        caseEntity.setDurationInSeconds(model.durationInSeconds());
-        caseEntity.setOwner(createUser());
+        aCase.setTitle(data.title());
+        aCase.setDescription(data.description());
+        aCase.setDurationInSeconds(data.durationInSeconds());
+        aCase.setOwner(createUser());
 
-        caseRepository.save(caseEntity);
+        caseRepository.save(aCase);
 
-        return CaseResource.fromEntity(caseEntity);
+        return aCase;
     }
 
     @Override
     @Transactional
     public void updateById(UUID id, CreateCaseRequest model) {
-        var caseEntity = findByIdOrThrow(id);
+        var aCase = findByIdOrThrow(id);
 
-        caseEntity.setTitle(model.title());
-        caseEntity.setDescription(model.description());
-        caseEntity.setDurationInSeconds(model.durationInSeconds());
+        aCase.setTitle(model.title());
+        aCase.setDescription(model.description());
+        aCase.setDurationInSeconds(model.durationInSeconds());
 
-        caseRepository.save(caseEntity);
+        caseRepository.save(aCase);
     }
 
     @Override

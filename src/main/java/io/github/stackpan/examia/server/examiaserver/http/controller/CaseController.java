@@ -1,21 +1,22 @@
 package io.github.stackpan.examia.server.examiaserver.http.controller;
 
 import io.github.stackpan.examia.server.examiaserver.assembler.CaseModelAssembler;
+import io.github.stackpan.examia.server.examiaserver.entity.Case;
 import io.github.stackpan.examia.server.examiaserver.http.resource.CaseResource;
 import io.github.stackpan.examia.server.examiaserver.http.request.CreateCaseRequest;
 import io.github.stackpan.examia.server.examiaserver.service.CaseService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.hateoas.CollectionModel;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.IanaLinkRelations;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
-
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @RestController
 @RequestMapping("/cases")
@@ -26,13 +27,13 @@ public class CaseController {
 
     private final CaseModelAssembler caseModelAssembler;
 
-    @GetMapping
-    public CollectionModel<EntityModel<CaseResource>> listCases() {
-        var cases = caseService.getAll().stream()
-                .map(caseModelAssembler::toModel)
-                .toList();
+    private final PagedResourcesAssembler<Case> pagedResourcesAssembler;
 
-        return CollectionModel.of(cases, linkTo(methodOn(CaseController.class).listCases()).withSelfRel());
+    @GetMapping
+    public PagedModel<EntityModel<CaseResource>> listCases(@PageableDefault(sort = "title") Pageable pageable) {
+        var casePage = caseService.getAll(pageable);
+
+        return pagedResourcesAssembler.toModel(casePage, caseModelAssembler);
     }
 
     @PostMapping

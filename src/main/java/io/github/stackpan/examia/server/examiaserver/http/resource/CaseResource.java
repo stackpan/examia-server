@@ -1,19 +1,30 @@
 package io.github.stackpan.examia.server.examiaserver.http.resource;
 
 import io.github.stackpan.examia.server.examiaserver.entity.Case;
+import lombok.EqualsAndHashCode;
+import lombok.Value;
+import org.springframework.hateoas.RepresentationModel;
 
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
-public record CaseResource(
-        UUID id,
-        String title,
-        String description,
-        Integer durationInSeconds,
-        CaseOwnerResource owner,
-        OffsetDateTime createdAt,
-        OffsetDateTime updatedAt
-) {
+@EqualsAndHashCode(callSuper = true)
+@Value
+public class CaseResource extends RepresentationModel<CaseResource> {
+
+    UUID id;
+
+    String title;
+
+    String description;
+
+    Integer durationInSeconds;
+
+    CaseOwnerResource owner;
+
+    OffsetDateTime createdAt;
+
+    OffsetDateTime updatedAt;
 
     public static CaseResource fromEntity(Case entity) {
         return new CaseResource(

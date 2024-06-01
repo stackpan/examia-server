@@ -1,18 +1,19 @@
 package io.github.stackpan.examia.server.examiaserver.service;
 
-import io.github.stackpan.examia.server.examiaserver.http.resource.CaseResource;
+import io.github.stackpan.examia.server.examiaserver.entity.Case;
 import io.github.stackpan.examia.server.examiaserver.http.request.CreateCaseRequest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
-import java.util.List;
 import java.util.UUID;
 
 public interface CaseService {
 
-    List<CaseResource> getAll();
+    Page<Case> getAll(Pageable pageable);
 
-    CaseResource getById(UUID id);
+    Case getById(UUID id);
 
-    CaseResource create(CreateCaseRequest model);
+    Case create(CreateCaseRequest model);
 
     void updateById(UUID id, CreateCaseRequest model);
 
