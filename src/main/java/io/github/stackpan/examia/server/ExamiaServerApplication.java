@@ -1,4 +1,4 @@
-package io.github.stackpan.examia.server.examiaserver;
+package io.github.stackpan.examia.server;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

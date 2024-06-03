@@ -1,11 +1,11 @@
-package io.github.stackpan.examia.server.examiaserver.service.impl;
+package io.github.stackpan.examia.server.service.impl;
 
-import io.github.stackpan.examia.server.examiaserver.entity.Case;
-import io.github.stackpan.examia.server.examiaserver.entity.User;
-import io.github.stackpan.examia.server.examiaserver.http.request.CreateCaseRequest;
-import io.github.stackpan.examia.server.examiaserver.repository.CaseRepository;
-import io.github.stackpan.examia.server.examiaserver.repository.UserRepository;
-import io.github.stackpan.examia.server.examiaserver.service.CaseService;
+import io.github.stackpan.examia.server.entity.Case;
+import io.github.stackpan.examia.server.entity.User;
+import io.github.stackpan.examia.server.http.request.CreateCaseRequest;
+import io.github.stackpan.examia.server.repository.CaseRepository;
+import io.github.stackpan.examia.server.repository.UserRepository;
+import io.github.stackpan.examia.server.service.CaseService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

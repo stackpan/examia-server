@@ -1,6 +1,6 @@
-package io.github.stackpan.examia.server.examiaserver.repository;
+package io.github.stackpan.examia.server.repository;
 
-import io.github.stackpan.examia.server.examiaserver.entity.User;
+import io.github.stackpan.examia.server.entity.User;
 import org.springframework.data.repository.CrudRepository;
 
 import java.util.Optional;

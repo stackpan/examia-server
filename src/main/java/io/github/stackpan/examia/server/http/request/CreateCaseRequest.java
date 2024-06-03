@@ -1,4 +1,4 @@
-package io.github.stackpan.examia.server.examiaserver.http.request;
+package io.github.stackpan.examia.server.http.request;
 
 import jakarta.validation.constraints.*;
 

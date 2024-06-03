@@ -1,6 +1,6 @@
-package io.github.stackpan.examia.server.examiaserver.http.resource;
+package io.github.stackpan.examia.server.http.resource;
 
-import io.github.stackpan.examia.server.examiaserver.entity.Case;
+import io.github.stackpan.examia.server.entity.Case;
 import lombok.EqualsAndHashCode;
 import lombok.Value;
 import org.springframework.hateoas.RepresentationModel;

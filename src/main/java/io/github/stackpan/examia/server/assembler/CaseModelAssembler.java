@@ -1,11 +1,12 @@
-package io.github.stackpan.examia.server.examiaserver.assembler;
+package io.github.stackpan.examia.server.assembler;
 
-import io.github.stackpan.examia.server.examiaserver.entity.Case;
-import io.github.stackpan.examia.server.examiaserver.http.controller.CaseController;
-import io.github.stackpan.examia.server.examiaserver.http.resource.CaseResource;
+import io.github.stackpan.examia.server.entity.Case;
+import io.github.stackpan.examia.server.http.controller.CaseController;
+import io.github.stackpan.examia.server.http.resource.CaseResource;
 import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.server.RepresentationModelAssembler;
+import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.stereotype.Component;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
@@ -18,7 +19,7 @@ public class CaseModelAssembler implements RepresentationModelAssembler<Case, En
     public EntityModel<CaseResource> toModel(Case entity) {
         return EntityModel.of(
                 CaseResource.fromEntity(entity),
-                linkTo(methodOn(CaseController.class).getCase(entity.getId().toString())).withSelfRel(),
+                WebMvcLinkBuilder.linkTo(methodOn(CaseController.class).getCase(entity.getId().toString())).withSelfRel(),
                 linkTo(methodOn(CaseController.class).listCases(Pageable.unpaged())).withRel("cases")
         );
     }

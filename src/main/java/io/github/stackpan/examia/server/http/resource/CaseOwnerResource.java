@@ -1,6 +1,6 @@
-package io.github.stackpan.examia.server.examiaserver.http.resource;
+package io.github.stackpan.examia.server.http.resource;
 
-import io.github.stackpan.examia.server.examiaserver.entity.User;
+import io.github.stackpan.examia.server.entity.User;
 
 import java.util.UUID;
 

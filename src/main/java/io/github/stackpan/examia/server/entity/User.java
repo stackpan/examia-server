@@ -1,4 +1,4 @@
-package io.github.stackpan.examia.server.examiaserver.entity;
+package io.github.stackpan.examia.server.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

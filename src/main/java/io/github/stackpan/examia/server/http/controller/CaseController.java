@@ -1,10 +1,10 @@
-package io.github.stackpan.examia.server.examiaserver.http.controller;
+package io.github.stackpan.examia.server.http.controller;
 
-import io.github.stackpan.examia.server.examiaserver.assembler.CaseModelAssembler;
-import io.github.stackpan.examia.server.examiaserver.entity.Case;
-import io.github.stackpan.examia.server.examiaserver.http.resource.CaseResource;
-import io.github.stackpan.examia.server.examiaserver.http.request.CreateCaseRequest;
-import io.github.stackpan.examia.server.examiaserver.service.CaseService;
+import io.github.stackpan.examia.server.assembler.CaseModelAssembler;
+import io.github.stackpan.examia.server.entity.Case;
+import io.github.stackpan.examia.server.http.resource.CaseResource;
+import io.github.stackpan.examia.server.http.request.CreateCaseRequest;
+import io.github.stackpan.examia.server.service.CaseService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;

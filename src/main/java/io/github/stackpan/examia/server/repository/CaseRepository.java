@@ -1,6 +1,6 @@
-package io.github.stackpan.examia.server.examiaserver.repository;
+package io.github.stackpan.examia.server.repository;
 
-import io.github.stackpan.examia.server.examiaserver.entity.Case;
+import io.github.stackpan.examia.server.entity.Case;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
