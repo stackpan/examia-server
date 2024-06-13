@@ -2,9 +2,11 @@ package io.github.stackpan.examia.server.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.io.Serializable;
-import java.time.OffsetDateTime;
+import java.time.Instant;
 import java.util.UUID;
 
 @Entity
@@ -33,10 +35,12 @@ public class Case implements Serializable {
     private Integer durationInSeconds;
 
     @Column(columnDefinition = "timestamptz")
-    private OffsetDateTime createdAt;
+    @CreationTimestamp
+    private Instant createdAt;
 
     @Column(columnDefinition = "timestamptz")
-    private OffsetDateTime updatedAt;
+    @UpdateTimestamp
+    private Instant updatedAt;
 
     @Column(nullable = false)
     private boolean isSoftDeleted = false;

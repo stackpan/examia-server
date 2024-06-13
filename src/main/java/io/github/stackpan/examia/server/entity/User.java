@@ -4,12 +4,14 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.time.OffsetDateTime;
 
 @Entity
 @Table(name = "users")
@@ -39,10 +41,12 @@ public class User implements Serializable {
     private String password;
 
     @Column(columnDefinition = "timestamptz")
-    private OffsetDateTime createdAt;
+    @CreationTimestamp
+    private Instant createdAt;
 
     @Column(columnDefinition = "timestamptz")
-    private OffsetDateTime updatedAt;
+    @UpdateTimestamp
+    private Instant updatedAt;
 
     @Column(nullable = false)
     private boolean isSoftDeleted = false;

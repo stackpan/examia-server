@@ -6,6 +6,7 @@ import lombok.Value;
 import org.springframework.hateoas.RepresentationModel;
 
 import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.UUID;
 
 @EqualsAndHashCode(callSuper = true)
@@ -33,8 +34,8 @@ public class CaseResource extends RepresentationModel<CaseResource> {
                 entity.getDescription(),
                 entity.getDurationInSeconds(),
                 CaseOwnerResource.fromEntity(entity.getOwner()),
-                entity.getCreatedAt(),
-                entity.getUpdatedAt()
+                entity.getCreatedAt().atOffset(ZoneOffset.UTC),
+                entity.getUpdatedAt().atOffset(ZoneOffset.UTC)
         );
     }
 
