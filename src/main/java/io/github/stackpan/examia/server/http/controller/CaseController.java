@@ -1,5 +1,6 @@
 package io.github.stackpan.examia.server.http.controller;
 
+import io.github.stackpan.examia.server.annotation.ValidUUID;
 import io.github.stackpan.examia.server.assembler.CaseModelAssembler;
 import io.github.stackpan.examia.server.entity.Case;
 import io.github.stackpan.examia.server.http.resource.CaseResource;
@@ -48,21 +49,21 @@ public class CaseController {
     }
 
     @GetMapping("/{caseId}")
-    public EntityModel<CaseResource> getCase(@PathVariable String caseId) {
+    public EntityModel<CaseResource> getCase(@PathVariable @ValidUUID String caseId) {
         var aCase = caseService.getById(UUID.fromString(caseId));
 
         return caseModelAssembler.toModel(aCase);
     }
 
     @PutMapping("/{caseId}")
-    public ResponseEntity<Void> updateCase(@PathVariable String caseId, @RequestBody @Valid CreateCaseRequest request) {
+    public ResponseEntity<Void> updateCase(@PathVariable @ValidUUID String caseId, @RequestBody @Valid CreateCaseRequest request) {
         caseService.updateById(UUID.fromString(caseId), request);
 
         return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/{caseId}")
-    public ResponseEntity<Void> deleteCase(@PathVariable String caseId) {
+    public ResponseEntity<Void> deleteCase(@PathVariable @ValidUUID String caseId) {
         caseService.deleteById(UUID.fromString(caseId));
 
         return ResponseEntity.noContent().build();

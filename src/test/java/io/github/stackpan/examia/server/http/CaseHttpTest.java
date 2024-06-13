@@ -124,5 +124,12 @@ public class CaseHttpTest {
 
             assertNotNull(responseBody.read("$._links"));
         }
+
+        @Test
+        public void notFound() {
+            var response = restTemplate.getForEntity("/cases/not-exists", String.class);
+
+            assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        }
     }
 }
