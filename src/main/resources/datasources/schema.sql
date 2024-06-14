@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS authentications
 CREATE TABLE IF NOT EXISTS cases
 (
     id                  UUID        NOT NULL PRIMARY KEY,
-    user_id             UUID        NOT NULL REFERENCES users (id),
+--     user_id             UUID        NOT NULL REFERENCES users (id),
     title               VARCHAR(50) NOT NULL,
     description         VARCHAR(500),
     duration_in_seconds INT,

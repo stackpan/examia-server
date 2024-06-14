@@ -51,7 +51,7 @@ public class User implements Serializable {
     @Column(nullable = false)
     private boolean isSoftDeleted = false;
 
-    @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
-    private List<Case> cases = new ArrayList<>();
+//    @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
+//    private List<Case> cases = new ArrayList<>();
 
 }

@@ -21,9 +21,9 @@ public class Case implements Serializable {
     @Column(columnDefinition = "uuid")
     private UUID id;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "user_id")
-    private User owner;
+//    @ManyToOne(fetch = FetchType.EAGER)
+//    @JoinColumn(name = "user_id")
+//    private User owner;
 
     @Column(length = 50, nullable = false)
     private String title;

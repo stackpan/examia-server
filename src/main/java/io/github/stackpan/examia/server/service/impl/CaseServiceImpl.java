@@ -42,7 +42,7 @@ public class CaseServiceImpl implements CaseService {
         aCase.setTitle(data.title());
         aCase.setDescription(data.description());
         aCase.setDurationInSeconds(data.durationInSeconds());
-        aCase.setOwner(createUser());
+//        aCase.setOwner(createUser());
 
         caseRepository.save(aCase);
 

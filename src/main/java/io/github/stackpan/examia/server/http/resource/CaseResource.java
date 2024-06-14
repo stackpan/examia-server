@@ -21,7 +21,7 @@ public class CaseResource extends RepresentationModel<CaseResource> {
 
     Integer durationInSeconds;
 
-    CaseOwnerResource owner;
+//    CaseOwnerResource owner;
 
     OffsetDateTime createdAt;
 
@@ -33,7 +33,7 @@ public class CaseResource extends RepresentationModel<CaseResource> {
                 entity.getTitle(),
                 entity.getDescription(),
                 entity.getDurationInSeconds(),
-                CaseOwnerResource.fromEntity(entity.getOwner()),
+//                CaseOwnerResource.fromEntity(entity.getOwner()),
                 entity.getCreatedAt().atOffset(ZoneOffset.UTC),
                 entity.getUpdatedAt().atOffset(ZoneOffset.UTC)
         );
