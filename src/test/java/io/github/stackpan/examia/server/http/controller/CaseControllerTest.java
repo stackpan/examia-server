@@ -44,14 +44,14 @@ public class CaseControllerTest {
                     .andExpect(status().isOk())
                     .andExpect(header().string(HttpHeaders.CONTENT_TYPE, "application/hal+json"))
                     .andExpectAll(
-                            jsonPath("$._embedded.caseResourceList.length()").value(3),
-                            jsonPath("$._embedded.caseResourceList[*].id").value(containsInAnyOrder("2eef6095-06af-4c07-b989-795d64c86625", "b9a5ebc1-b77f-495d-9f28-5a181bf543bf", "f22a0d17-f8ba-44fb-b003-444124f6d1d3")),
-                            jsonPath("$._embedded.caseResourceList[*].title").value(containsInAnyOrder("Case Title 1", "Case Title 2", "Case Title 3")),
-                            jsonPath("$._embedded.caseResourceList[*].description").value(containsInAnyOrder("Case 1 Description.", "Case 2 Description.", "Case 3 Description.")),
-                            jsonPath("$._embedded.caseResourceList[*].durationInSeconds").value(containsInAnyOrder(1800, 1900, 2000)),
-                            jsonPath("$._embedded.caseResourceList[*].createdAt").value(containsInAnyOrder("2024-05-16T00:00:01Z", "2024-05-16T00:00:02Z", "2024-05-16T00:00:03Z")),
-                            jsonPath("$._embedded.caseResourceList[*].updatedAt").value(containsInAnyOrder("2024-05-16T00:00:01Z", "2024-05-16T00:00:02Z", "2024-05-16T00:00:03Z")),
-                            jsonPath("$._embedded.caseResourceList[*]._links.self.href").value(containsInAnyOrder(containsString("/cases/2eef6095-06af-4c07-b989-795d64c86625"), containsString("/cases/b9a5ebc1-b77f-495d-9f28-5a181bf543bf"), containsString("/cases/f22a0d17-f8ba-44fb-b003-444124f6d1d3"))),
+                            jsonPath("$._embedded.cases.length()").value(3),
+                            jsonPath("$._embedded.cases[*].id").value(containsInAnyOrder("2eef6095-06af-4c07-b989-795d64c86625", "b9a5ebc1-b77f-495d-9f28-5a181bf543bf", "f22a0d17-f8ba-44fb-b003-444124f6d1d3")),
+                            jsonPath("$._embedded.cases[*].title").value(containsInAnyOrder("Case Title 1", "Case Title 2", "Case Title 3")),
+                            jsonPath("$._embedded.cases[*].description").value(containsInAnyOrder("Case 1 Description.", "Case 2 Description.", "Case 3 Description.")),
+                            jsonPath("$._embedded.cases[*].durationInSeconds").value(containsInAnyOrder(1800, 1900, 2000)),
+                            jsonPath("$._embedded.cases[*].createdAt").value(containsInAnyOrder("2024-05-16T00:00:01Z", "2024-05-16T00:00:02Z", "2024-05-16T00:00:03Z")),
+                            jsonPath("$._embedded.cases[*].updatedAt").value(containsInAnyOrder("2024-05-16T00:00:01Z", "2024-05-16T00:00:02Z", "2024-05-16T00:00:03Z")),
+                            jsonPath("$._embedded.cases[*]._links.self.href").value(containsInAnyOrder(containsString("/cases/2eef6095-06af-4c07-b989-795d64c86625"), containsString("/cases/b9a5ebc1-b77f-495d-9f28-5a181bf543bf"), containsString("/cases/f22a0d17-f8ba-44fb-b003-444124f6d1d3"))),
                             jsonPath("$._links.self.href").value(containsString("/cases")),
                             jsonPath("$.page.size").value(10),
                             jsonPath("$.page.totalElements").value(3),
