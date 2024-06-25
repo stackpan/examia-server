@@ -106,7 +106,7 @@ public class CaseControllerTest {
                     .andExpect(status().isCreated())
                     .andExpectAll(
                             header().string(HttpHeaders.CONTENT_TYPE, "application/hal+json"),
-                            header().exists(HttpHeaders.LOCATION))
+                            header().string(HttpHeaders.LOCATION, matchesPattern("^.*/cases/" + Regexps.UUID)))
                     .andExpectAll(
                             jsonPath("$.id", matchesPattern(Regexps.UUID)),
                             jsonPath("$.title").value(JsonPath.<String>read(requestBody, "$.title")),
