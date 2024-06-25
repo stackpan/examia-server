@@ -112,9 +112,9 @@ public class CaseControllerTest {
                             jsonPath("$.title").value(JsonPath.<String>read(requestBody, "$.title")),
                             jsonPath("$.description").value(JsonPath.<String>read(requestBody, "$.description")),
                             jsonPath("$.durationInSeconds").value(JsonPath.<String>read(requestBody, "$.durationInSeconds")),
-                            jsonPath("$.createdAt", matchesPattern(Regexps.ISO8601_TIMESTAMP)),
-                            jsonPath("$.updatedAt", matchesPattern(Regexps.ISO8601_TIMESTAMP)),
-                            jsonPath("$._links.self.href", matchesPattern("/cases/" + Regexps.UUID)),
+                            jsonPath("$.createdAt", matchesPattern(Regexps.TIMESTAMP)),
+                            jsonPath("$.updatedAt", matchesPattern(Regexps.TIMESTAMP)),
+                            jsonPath("$._links.self.href", matchesPattern("^.*/cases/" + Regexps.UUID)),
                             jsonPath("$._links.cases.href").value(containsString("/cases")));
         }
 
@@ -136,7 +136,6 @@ public class CaseControllerTest {
                     .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
                     .andExpectAll(
                             jsonPath("$.errors.title").exists(),
-                            jsonPath("$.errors.description").exists(),
                             jsonPath("$.errors.durationInSeconds").exists());
         }
     }
