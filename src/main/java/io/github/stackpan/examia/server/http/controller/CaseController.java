@@ -2,6 +2,7 @@ package io.github.stackpan.examia.server.http.controller;
 
 import io.github.stackpan.examia.server.assembler.CaseModelAssembler;
 import io.github.stackpan.examia.server.entity.Case;
+import io.github.stackpan.examia.server.http.request.UpdateCaseRequest;
 import io.github.stackpan.examia.server.http.resource.CaseResource;
 import io.github.stackpan.examia.server.http.request.CreateCaseRequest;
 import io.github.stackpan.examia.server.service.CaseService;
@@ -53,7 +54,7 @@ public class CaseController {
     }
 
     @PutMapping("/{caseId}")
-    public ResponseEntity<Void> updateCase(@PathVariable String caseId, @RequestBody @Valid CreateCaseRequest request) {
+    public ResponseEntity<Void> updateCase(@PathVariable String caseId, @RequestBody @Valid UpdateCaseRequest request) {
         caseService.updateById(caseId, request);
 
         return ResponseEntity.noContent().build();

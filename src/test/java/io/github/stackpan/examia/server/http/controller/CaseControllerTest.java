@@ -2,6 +2,7 @@ package io.github.stackpan.examia.server.http.controller;
 
 import com.jayway.jsonpath.JsonPath;
 import io.github.stackpan.examia.server.util.Regexps;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,10 +10,15 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 
 
+import java.util.Map;
+import java.util.UUID;
+
+import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.hamcrest.Matchers.*;
@@ -25,6 +31,9 @@ public class CaseControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
+
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
     @Nested
     class ListCases {
@@ -143,6 +152,84 @@ public class CaseControllerTest {
     @Nested
     class UpdateCase {
 
+        private final String targetId = "2eef6095-06af-4c07-b989-795d64c86625";
+
+        private Map<String, Object> before;
+
+        @BeforeEach
+        void setUp() {
+            before = jdbcTemplate.queryForMap("SELECT * FROM cases WHERE id = ?", UUID.fromString(targetId));
+        }
+
+        @Test
+        void shouldReturnNoContentAndChangedOnDatabase() throws Exception {
+            var requestBody = """
+                    {
+                        "title": "Updated case Title 1",
+                        "description": "Updated case 1 Description.",
+                        "durationInSeconds": 1700
+                    }
+                    """;
+
+            mockMvc.perform(
+                            put("/cases/%s".formatted(targetId))
+                                    .contentType(MediaType.APPLICATION_JSON_VALUE)
+                                    .content(requestBody))
+                    .andExpect(status().isNoContent());
+
+            var after = jdbcTemplate.queryForMap("SELECT * FROM cases WHERE id = ?", UUID.fromString(targetId));
+
+            assertNotEquals(before.get("title"), after.get("title"));
+            assertEquals(JsonPath.<String>read(requestBody, "$.title"), after.get("title"));
+            assertNotEquals(before.get("description"), after.get("description"));
+            assertEquals(JsonPath.<String>read(requestBody, "$.description"), after.get("description"));
+            assertNotEquals(before.get("duration_in_seconds"), after.get("duration_in_seconds"));
+            assertEquals(JsonPath.<String>read(requestBody, "$.durationInSeconds"), after.get("duration_in_seconds"));
+            assertNotEquals(before.get("updated_at"), after.get("updated_at"));
+        }
+
+        @Test
+        void invalidPayloadShouldReturnBadRequest() throws Exception {
+            var requestBody = """
+                    {
+                        "title": true,
+                        "durationInSeconds": -900
+                    }
+                    """;
+
+            mockMvc.perform(
+                            put("/cases/%s".formatted(targetId))
+                                    .contentType(MediaType.APPLICATION_JSON_VALUE)
+                                    .content(requestBody))
+                    .andExpect(status().isBadRequest())
+                    .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                    .andExpectAll(
+                            jsonPath("$.errors.title").exists(),
+                            jsonPath("$.errors.durationInSeconds").exists());
+        }
+
+        @Test
+        void toUnknownIdShouldReturnNotFound() throws Exception {
+            String[] caseIds = {"17e3f075-4d00-4d70-ba24-68123777f0", "1", "CASE-001", "not-exists"};
+
+            var requestBody = """
+                    {
+                        "title": "Updated case Title 1",
+                        "description": "Updated case 1 Description.",
+                        "durationInSeconds": 1700
+                    }
+                    """;
+
+            for (var caseId : caseIds) {
+                mockMvc.perform(
+                                put("/cases/%s".formatted(caseId))
+                                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                                        .content(requestBody))
+                        .andExpect(status().isNotFound())
+                        .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                        .andExpect(jsonPath("$.errors").value("Cannot find Case with identity: %s".formatted(caseId)));
+            }
+        }
     }
 
     @Nested

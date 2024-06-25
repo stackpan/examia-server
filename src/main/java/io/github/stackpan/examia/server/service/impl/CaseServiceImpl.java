@@ -4,6 +4,7 @@ import io.github.stackpan.examia.server.entity.Case;
 import io.github.stackpan.examia.server.entity.User;
 import io.github.stackpan.examia.server.exception.ResourceNotFoundException;
 import io.github.stackpan.examia.server.http.request.CreateCaseRequest;
+import io.github.stackpan.examia.server.http.request.UpdateCaseRequest;
 import io.github.stackpan.examia.server.repository.CaseRepository;
 import io.github.stackpan.examia.server.repository.UserRepository;
 import io.github.stackpan.examia.server.service.CaseService;
@@ -53,7 +54,7 @@ public class CaseServiceImpl implements CaseService {
 
     @Override
     @Transactional
-    public void updateById(String id, CreateCaseRequest model) {
+    public void updateById(String id, UpdateCaseRequest model) {
         var aCase = findByIdOrThrow(id);
 
         aCase.setTitle(model.title());
