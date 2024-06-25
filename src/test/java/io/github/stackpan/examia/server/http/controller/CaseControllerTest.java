@@ -15,8 +15,8 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 
 
-import java.util.Map;
-import java.util.UUID;
+import java.sql.Timestamp;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -56,6 +56,36 @@ public class CaseControllerTest {
                             jsonPath("$.page.size").value(10),
                             jsonPath("$.page.totalElements").value(3),
                             jsonPath("$.page.totalPages").value(1),
+                            jsonPath("$.page.number").value(0));
+        }
+
+        @Test
+        void shouldReturnAppropriatePage() throws Exception {
+            generateCaseDummies(17);
+
+            mockMvc.perform(get("/cases?page=1"))
+                    .andExpect(status().isOk())
+                    .andExpect(header().string(HttpHeaders.CONTENT_TYPE, "application/hal+json"))
+                    .andExpectAll(
+                            jsonPath("$._embedded.cases.length()").value(10),
+                            jsonPath("$.page.size").value(10),
+                            jsonPath("$.page.totalElements").value(20),
+                            jsonPath("$.page.totalPages").value(2),
+                            jsonPath("$.page.number").value(1));
+        }
+
+        @Test
+        void withSizeShouldReturnAppropriatePageSize() throws Exception {
+            generateCaseDummies(12);
+
+            mockMvc.perform(get("/cases?size=5"))
+                    .andExpect(status().isOk())
+                    .andExpect(header().string(HttpHeaders.CONTENT_TYPE, "application/hal+json"))
+                    .andExpectAll(
+                            jsonPath("$._embedded.cases.length()").value(5),
+                            jsonPath("$.page.size").value(5),
+                            jsonPath("$.page.totalElements").value(15),
+                            jsonPath("$.page.totalPages").value(3),
                             jsonPath("$.page.number").value(0));
         }
     }
@@ -259,6 +289,28 @@ public class CaseControllerTest {
                         .andExpect(status().isNotFound());
             }
         }
+    }
+
+    private void generateCaseDummies(int count) {
+        List<Object> argList = new ArrayList<>();
+        var sqlBuilder = new StringBuilder("INSERT INTO cases (id, title, description, duration_in_seconds, created_at, updated_at) VALUES ");
+
+        for (int i = 0; i < count; i++) {
+            argList.add(UUID.randomUUID());
+            argList.add("Case Title 1%s".formatted(i));
+            argList.add("Case 1%d Description.".formatted(i));
+            argList.add(2000 + (i * 10));
+            argList.add(new Timestamp(new Date().getTime()));
+            argList.add(new Timestamp(new Date().getTime()));
+
+            sqlBuilder.append("(?, ?, ?, ?, ?, ?)");
+            sqlBuilder.append((i < count - 1) ? ", " : ";"); // Use semicolon at the end of the query
+        }
+
+        List<Object[]> batchArgs = new ArrayList<>();
+        batchArgs.add(argList.toArray());
+
+        jdbcTemplate.batchUpdate(sqlBuilder.toString(), batchArgs);
     }
 
 }
