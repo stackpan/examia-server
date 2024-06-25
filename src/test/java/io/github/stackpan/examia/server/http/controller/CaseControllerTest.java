@@ -39,7 +39,7 @@ public class CaseControllerTest {
     class ListCases {
 
         @Test
-        void success() throws Exception {
+        void shouldReturnPaginatedCases() throws Exception {
             mockMvc.perform(get("/cases"))
                     .andExpect(status().isOk())
                     .andExpect(header().string(HttpHeaders.CONTENT_TYPE, "application/hal+json"))
@@ -64,7 +64,7 @@ public class CaseControllerTest {
     class GetCase {
 
         @Test
-        void success() throws Exception {
+        void shouldReturnCase() throws Exception {
             var caseId = "2eef6095-06af-4c07-b989-795d64c86625";
 
             mockMvc.perform(get("/cases/%s".formatted(caseId)))
@@ -82,7 +82,7 @@ public class CaseControllerTest {
         }
 
         @Test
-        void notFound() throws Exception {
+        void toUnknownIdShouldReturnNotFound() throws Exception {
             String[] caseIds = {"17e3f075-4d00-4d70-ba24-68123777f0", "1", "CASE-001", "not-exists"};
 
             for (var caseId : caseIds) {
@@ -98,7 +98,7 @@ public class CaseControllerTest {
     class CreateCase {
 
         @Test
-        void created() throws Exception {
+        void shouldReturnCreatedAndExistsOnDatabase() throws Exception {
             var requestBody = """
                     {
                         "title": "New Case",
@@ -107,11 +107,10 @@ public class CaseControllerTest {
                     }
                     """;
 
-            mockMvc.perform(
-                            post("/cases")
-                                    .contentType(MediaType.APPLICATION_JSON_VALUE)
-                                    .accept("application/hal+json")
-                                    .content(requestBody))
+            mockMvc.perform(post("/cases")
+                            .contentType(MediaType.APPLICATION_JSON_VALUE)
+                            .accept("application/hal+json")
+                            .content(requestBody))
                     .andExpect(status().isCreated())
                     .andExpectAll(
                             header().string(HttpHeaders.CONTENT_TYPE, "application/hal+json"),
@@ -124,11 +123,19 @@ public class CaseControllerTest {
                             jsonPath("$.createdAt", matchesPattern(Regexps.TIMESTAMP)),
                             jsonPath("$.updatedAt", matchesPattern(Regexps.TIMESTAMP)),
                             jsonPath("$._links.self.href", matchesPattern("^.*/cases/" + Regexps.UUID)),
-                            jsonPath("$._links.cases.href").value(containsString("/cases")));
+                            jsonPath("$._links.cases.href").value(containsString("/cases")))
+                    .andDo(result -> {
+                        var responseContent = result.getResponse().getContentAsString();
+
+                        var id = JsonPath.<String>read(responseContent, "$.id");
+                        var count = jdbcTemplate.queryForObject("SELECT count(*) FROM cases WHERE id = ?", Integer.class, UUID.fromString(id));
+
+                        assertEquals(1, count);
+                    });
         }
 
         @Test
-        void badRequest() throws Exception {
+        void invalidPayloadShouldReturnBadRequest() throws Exception {
             var requestBody = """
                     {
                         "title": true,
@@ -136,11 +143,10 @@ public class CaseControllerTest {
                     }
                     """;
 
-            mockMvc.perform(
-                            post("/cases")
-                                    .contentType(MediaType.APPLICATION_JSON_VALUE)
-                                    .accept("application/hal+json")
-                                    .content(requestBody))
+            mockMvc.perform(post("/cases")
+                            .contentType(MediaType.APPLICATION_JSON_VALUE)
+                            .accept("application/hal+json")
+                            .content(requestBody))
                     .andExpect(status().isBadRequest())
                     .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
                     .andExpectAll(
@@ -171,10 +177,9 @@ public class CaseControllerTest {
                     }
                     """;
 
-            mockMvc.perform(
-                            put("/cases/%s".formatted(targetId))
-                                    .contentType(MediaType.APPLICATION_JSON_VALUE)
-                                    .content(requestBody))
+            mockMvc.perform(put("/cases/%s".formatted(targetId))
+                            .contentType(MediaType.APPLICATION_JSON_VALUE)
+                            .content(requestBody))
                     .andExpect(status().isNoContent());
 
             var after = jdbcTemplate.queryForMap("SELECT * FROM cases WHERE id = ?", UUID.fromString(targetId));
@@ -197,10 +202,9 @@ public class CaseControllerTest {
                     }
                     """;
 
-            mockMvc.perform(
-                            put("/cases/%s".formatted(targetId))
-                                    .contentType(MediaType.APPLICATION_JSON_VALUE)
-                                    .content(requestBody))
+            mockMvc.perform(put("/cases/%s".formatted(targetId))
+                            .contentType(MediaType.APPLICATION_JSON_VALUE)
+                            .content(requestBody))
                     .andExpect(status().isBadRequest())
                     .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
                     .andExpectAll(
@@ -221,10 +225,9 @@ public class CaseControllerTest {
                     """;
 
             for (var caseId : caseIds) {
-                mockMvc.perform(
-                                put("/cases/%s".formatted(caseId))
-                                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                                        .content(requestBody))
+                mockMvc.perform(put("/cases/%s".formatted(caseId))
+                                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                                .content(requestBody))
                         .andExpect(status().isNotFound())
                         .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
                         .andExpect(jsonPath("$.errors").value("Cannot find Case with identity: %s".formatted(caseId)));
