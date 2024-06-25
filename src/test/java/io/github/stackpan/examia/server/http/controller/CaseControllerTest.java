@@ -235,6 +235,27 @@ public class CaseControllerTest {
     @Nested
     class DeleteCase {
 
+        private final String targetId = "2eef6095-06af-4c07-b989-795d64c86625";
+
+        @Test
+        void shouldReturnNoContentAndDisappearedOnDatabase() throws Exception {
+            mockMvc.perform(delete("/cases/%s".formatted(targetId)))
+                    .andExpect(status().isNoContent());
+
+            var count = jdbcTemplate.queryForObject("SELECT count(*) FROM cases WHERE id = ?", Integer.class, UUID.fromString(targetId));
+
+            assertEquals(0, count);
+        }
+
+        @Test
+        void toUnknownIdShouldReturnNotFound() throws Exception {
+            String[] caseIds = {"17e3f075-4d00-4d70-ba24-68123777f0", "1", "CASE-001", "not-exists"};
+
+            for (var caseId : caseIds) {
+                mockMvc.perform(delete("/cases/%s".formatted(caseId)))
+                        .andExpect(status().isNotFound());
+            }
+        }
     }
 
 }
