@@ -80,7 +80,7 @@ public class CaseControllerTest {
                 mockMvc.perform(get("/cases/%s".formatted(caseId)))
                         .andExpect(status().isNotFound())
                         .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
-                        .andExpect(jsonPath("$.errors").value("Cannot find case with identity: %s".formatted(caseId)));
+                        .andExpect(jsonPath("$.errors").value("Cannot find Case with identity: %s".formatted(caseId)));
             }
         }
     }
