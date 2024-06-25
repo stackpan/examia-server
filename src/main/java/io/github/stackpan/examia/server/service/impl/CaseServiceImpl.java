@@ -2,17 +2,17 @@ package io.github.stackpan.examia.server.service.impl;
 
 import io.github.stackpan.examia.server.entity.Case;
 import io.github.stackpan.examia.server.entity.User;
+import io.github.stackpan.examia.server.exception.ResourceNotFoundException;
 import io.github.stackpan.examia.server.http.request.CreateCaseRequest;
 import io.github.stackpan.examia.server.repository.CaseRepository;
 import io.github.stackpan.examia.server.repository.UserRepository;
 import io.github.stackpan.examia.server.service.CaseService;
+import io.github.stackpan.examia.server.util.UUIDs;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.UUID;
 
@@ -24,13 +24,15 @@ public class CaseServiceImpl implements CaseService {
 
     private final UserRepository userRepository;
 
+    private final String resourceContextName = Case.class.getSimpleName();
+
     @Override
     public Page<Case> getAll(Pageable pageable) {
         return caseRepository.findAll(pageable);
     }
 
     @Override
-    public Case getById(UUID id) {
+    public Case getById(String id) {
         return findByIdOrThrow(id);
     }
 
@@ -51,7 +53,7 @@ public class CaseServiceImpl implements CaseService {
 
     @Override
     @Transactional
-    public void updateById(UUID id, CreateCaseRequest model) {
+    public void updateById(String id, CreateCaseRequest model) {
         var aCase = findByIdOrThrow(id);
 
         aCase.setTitle(model.title());
@@ -63,17 +65,23 @@ public class CaseServiceImpl implements CaseService {
 
     @Override
     @Transactional
-    public void deleteById(UUID id) {
-        if (!caseRepository.existsById(id)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+    public void deleteById(String id) {
+        var caseUuid = validateUuid(id);
+
+        if (!caseRepository.existsById(caseUuid)) {
+            throw new ResourceNotFoundException(resourceContextName, id);
         }
 
-        caseRepository.deleteById(id);
+        caseRepository.deleteById(caseUuid);
     }
 
-    private Case findByIdOrThrow(UUID id) {
-        return caseRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+    private UUID validateUuid(String id) {
+        return UUIDs.fromString(id).orElseThrows(() -> new ResourceNotFoundException(resourceContextName, id));
+    }
+
+    private Case findByIdOrThrow(String id) {
+        return caseRepository.findById(validateUuid(id))
+                .orElseThrow(() -> new ResourceNotFoundException(resourceContextName, id));
     }
 
     private User createUser() {
