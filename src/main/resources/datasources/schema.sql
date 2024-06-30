@@ -6,6 +6,7 @@ CREATE TABLE IF NOT EXISTS users
     first_name      VARCHAR(50)   NOT NULL,
     last_name       VARCHAR(100),
     password        VARCHAR(1000) NOT NULL,
+    role            VARCHAR(10)   NOT NULL,
     created_at      TIMESTAMPTZ,
     updated_at      TIMESTAMPTZ,
     is_soft_deleted BOOLEAN       NOT NULL DEFAULT FALSE
