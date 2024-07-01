@@ -1,4 +1,4 @@
-package io.github.stackpan.examia.server.configuration;
+package io.github.stackpan.examia.server.config;
 
 import io.github.stackpan.examia.server.service.impl.ExamiaUserServiceImpl;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +16,7 @@ import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 @RequiredArgsConstructor
-public class SecurityConfiguration {
+public class SecurityConfig {
 
     private final ExamiaUserServiceImpl examiaUserServiceImpl;
 
