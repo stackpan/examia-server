@@ -9,7 +9,8 @@ public record CaseOwnerResource(
         String username,
         String email,
         String firstName,
-        String lastName
+        String lastName,
+        String role
 ) {
 
     public static CaseOwnerResource fromEntity(User entity) {
@@ -18,7 +19,8 @@ public record CaseOwnerResource(
                 entity.getUsername(),
                 entity.getEmail(),
                 entity.getFirstName(),
-                entity.getLastName()
+                entity.getLastName(),
+                entity.getRole()
         );
     }
 

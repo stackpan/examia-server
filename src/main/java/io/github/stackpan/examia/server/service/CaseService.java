@@ -8,6 +8,8 @@ import org.springframework.data.domain.Pageable;
 
 public interface CaseService {
 
+    Page<Case> getAllByUserId(Pageable pageable, String userId);
+
     Page<Case> getAll(Pageable pageable);
 
     Case getById(String id);

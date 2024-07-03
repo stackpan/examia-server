@@ -28,6 +28,14 @@ public class CaseServiceImpl implements CaseService {
     private final String resourceContextName = Case.class.getSimpleName();
 
     @Override
+    public Page<Case> getAllByUserId(Pageable pageable, String userId) {
+        return caseRepository.findAllByUserId(
+                UUIDs.fromString(userId).orElseThrows(() -> new ResourceNotFoundException(User.class.getName(), userId)),
+                pageable
+        );
+    }
+
+    @Override
     public Page<Case> getAll(Pageable pageable) {
         return caseRepository.findAll(pageable);
     }

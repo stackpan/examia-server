@@ -15,6 +15,7 @@ import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.IanaLinkRelations;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -24,21 +25,20 @@ public class CaseController {
 
     private final CaseService caseService;
 
-    private final CaseModelAssembler caseModelAssembler;
-
     private final PagedResourcesAssembler<Case> pagedResourcesAssembler;
 
     @GetMapping
-    public PagedModel<EntityModel<CaseResource>> listCases(@PageableDefault(sort = "title") Pageable pageable) {
-        var casePage = caseService.getAll(pageable);
+    public PagedModel<EntityModel<CaseResource>> listCases(@PageableDefault(sort = "title") Pageable pageable, JwtAuthenticationToken jwt) {
+        var casePage = caseService.getAllByUserId(pageable, (String) jwt.getTokenAttributes().get("sub"));
 
-        return pagedResourcesAssembler.toModel(casePage, caseModelAssembler);
+        return pagedResourcesAssembler.toModel(casePage, new CaseModelAssembler(jwt));
     }
 
     @PostMapping
-    public ResponseEntity<EntityModel<CaseResource>> createCase(@RequestBody @Valid CreateCaseRequest request) {
+    public ResponseEntity<EntityModel<CaseResource>> createCase(@RequestBody @Valid CreateCaseRequest request, JwtAuthenticationToken jwt) {
         var created = caseService.create(request);
 
+        var caseModelAssembler = new CaseModelAssembler(jwt);
         var entityModel = caseModelAssembler.toModel(created);
 
         return ResponseEntity
@@ -47,9 +47,10 @@ public class CaseController {
     }
 
     @GetMapping("/{caseId}")
-    public EntityModel<CaseResource> getCase(@PathVariable String caseId) {
+    public EntityModel<CaseResource> getCase(@PathVariable String caseId, JwtAuthenticationToken jwt) {
         var aCase = caseService.getById(caseId);
 
+        var caseModelAssembler = new CaseModelAssembler(jwt);
         return caseModelAssembler.toModel(aCase);
     }
 
