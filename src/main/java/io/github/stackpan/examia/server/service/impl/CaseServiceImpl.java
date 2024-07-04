@@ -15,8 +15,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.UUID;
-
 @Service
 @RequiredArgsConstructor
 public class CaseServiceImpl implements CaseService {
@@ -25,79 +23,60 @@ public class CaseServiceImpl implements CaseService {
 
     private final UserRepository userRepository;
 
-    private final String resourceContextName = Case.class.getSimpleName();
-
     @Override
-    public Page<Case> getAll(Pageable pageable) {
-        return caseRepository.findAll(pageable);
+    public Page<Case> getAllByUserId(Pageable pageable, String userId) {
+        return caseRepository.findAllByUserId(
+                UUIDs.fromString(userId).orElseThrowsResourceNotFound(User.class),
+                pageable
+        );
     }
 
     @Override
-    public Case getById(String id) {
-        return findByIdOrThrow(id);
-    }
-
-    @Override
-    @Transactional
-    public Case create(CreateCaseRequest data) {
-        var aCase = new Case();
-
-        aCase.setTitle(data.title());
-        aCase.setDescription(data.description());
-        aCase.setDurationInSeconds(data.durationInSeconds());
-//        aCase.setOwner(createUser());
-
-        caseRepository.save(aCase);
-
-        return aCase;
+    public Case getByCaseIdAndUserId(String caseId, String userId) {
+        return findOneOrThrow(caseId, userId);
     }
 
     @Override
     @Transactional
-    public void updateById(String id, UpdateCaseRequest model) {
-        var aCase = findByIdOrThrow(id);
+    public Case createByUserId(CreateCaseRequest data, String userId) {
+        var user = userRepository.findById(UUIDs.fromString(userId)
+                        .orElseThrowsResourceNotFound(User.class))
+                .orElseThrow(() -> new ResourceNotFoundException(User.class.getSimpleName(), userId));
 
-        aCase.setTitle(model.title());
-        aCase.setDescription(model.description());
-        aCase.setDurationInSeconds(model.durationInSeconds());
+        var examiaCase = new Case();
+        examiaCase.setTitle(data.title());
+        examiaCase.setDescription(data.description());
+        examiaCase.setDurationInSeconds(data.durationInSeconds());
+        examiaCase.setUser(user);
 
-        caseRepository.save(aCase);
+        caseRepository.save(examiaCase);
+        return examiaCase;
     }
 
     @Override
     @Transactional
-    public void deleteById(String id) {
-        var caseUuid = validateUuid(id);
+    public void updateByCaseIdAndUserId(String caseId, String userId, UpdateCaseRequest model) {
+        var examiaCase = findOneOrThrow(caseId, userId);
+        examiaCase.setTitle(model.title());
+        examiaCase.setDescription(model.description());
+        examiaCase.setDurationInSeconds(model.durationInSeconds());
 
-        if (!caseRepository.existsById(caseUuid)) {
-            throw new ResourceNotFoundException(resourceContextName, id);
-        }
-
-        caseRepository.deleteById(caseUuid);
+        caseRepository.save(examiaCase);
     }
 
-    private UUID validateUuid(String id) {
-        return UUIDs.fromString(id).orElseThrows(() -> new ResourceNotFoundException(resourceContextName, id));
+    @Override
+    @Transactional
+    public void deleteByCaseIdAndUserId(String caseId, String userId) {
+        var examiaCase = findOneOrThrow(caseId, userId);
+
+        caseRepository.deleteById(examiaCase.getId());
     }
 
-    private Case findByIdOrThrow(String id) {
-        return caseRepository.findById(validateUuid(id))
-                .orElseThrow(() -> new ResourceNotFoundException(resourceContextName, id));
-    }
-
-    private User createUser() {
-        return userRepository.findByUsername("john_doe")
-                .orElseGet(() -> {
-                    var newUser = new User();
-                    newUser.setUsername("john_doe");
-                    newUser.setEmail("johndoe@example.com");
-                    newUser.setFirstName("John");
-                    newUser.setPassword("password");
-
-                    userRepository.save(newUser);
-
-                    return newUser;
-                });
+    private Case findOneOrThrow(String caseId, String userId) {
+        return caseRepository.findByIdAndUserId(
+                UUIDs.fromString(caseId).orElseThrowsResourceNotFound(Case.class),
+                UUIDs.fromString(userId).orElseThrowsResourceNotFound(User.class)
+        ).orElseThrow(() -> new ResourceNotFoundException(Case.class.getSimpleName(), caseId));
     }
 
 }

@@ -8,14 +8,14 @@ import org.springframework.data.domain.Pageable;
 
 public interface CaseService {
 
-    Page<Case> getAll(Pageable pageable);
+    Page<Case> getAllByUserId(Pageable pageable, String userId);
 
-    Case getById(String id);
+    Case getByCaseIdAndUserId(String caseId, String userId);
 
-    Case create(CreateCaseRequest model);
+    Case createByUserId(CreateCaseRequest data, String userId);
 
-    void updateById(String id, UpdateCaseRequest model);
+    void updateByCaseIdAndUserId(String caseId, String userId, UpdateCaseRequest model);
 
-    void deleteById(String id);
+    void deleteByCaseIdAndUserId(String caseId, String userId);
 
 }

@@ -15,10 +15,11 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 
 
-import java.util.Map;
-import java.util.UUID;
+import java.sql.Timestamp;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.hamcrest.Matchers.*;
@@ -26,7 +27,7 @@ import static org.hamcrest.Matchers.*;
 @SpringBootTest
 @AutoConfigureMockMvc
 @Sql(scripts = {"classpath:datasources/drop.sql", "classpath:datasources/schema.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_CLASS)
-@Sql(scripts = "classpath:datasources/testdata/case.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+@Sql(scripts = {"classpath:datasources/testdata/user.sql", "classpath:datasources/testdata/case.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 public class CaseControllerTest {
 
     @Autowired
@@ -40,22 +41,67 @@ public class CaseControllerTest {
 
         @Test
         void shouldReturnPaginatedCases() throws Exception {
-            mockMvc.perform(get("/cases"))
+            mockMvc.perform(get("/cases")
+                            .with(jwt().jwt(jwt -> jwt
+                                    .claim("sub", "157e4056-3a6e-4410-bc15-f14ea86887b6")
+                                    .claim("scope", "USER"))))
                     .andExpect(status().isOk())
                     .andExpect(header().string(HttpHeaders.CONTENT_TYPE, "application/hal+json"))
                     .andExpectAll(
-                            jsonPath("$._embedded.caseResourceList.length()").value(3),
-                            jsonPath("$._embedded.caseResourceList[*].id").value(containsInAnyOrder("2eef6095-06af-4c07-b989-795d64c86625", "b9a5ebc1-b77f-495d-9f28-5a181bf543bf", "f22a0d17-f8ba-44fb-b003-444124f6d1d3")),
-                            jsonPath("$._embedded.caseResourceList[*].title").value(containsInAnyOrder("Case Title 1", "Case Title 2", "Case Title 3")),
-                            jsonPath("$._embedded.caseResourceList[*].description").value(containsInAnyOrder("Case 1 Description.", "Case 2 Description.", "Case 3 Description.")),
-                            jsonPath("$._embedded.caseResourceList[*].durationInSeconds").value(containsInAnyOrder(1800, 1900, 2000)),
-                            jsonPath("$._embedded.caseResourceList[*].createdAt").value(containsInAnyOrder("2024-05-16T00:00:01Z", "2024-05-16T00:00:02Z", "2024-05-16T00:00:03Z")),
-                            jsonPath("$._embedded.caseResourceList[*].updatedAt").value(containsInAnyOrder("2024-05-16T00:00:01Z", "2024-05-16T00:00:02Z", "2024-05-16T00:00:03Z")),
-                            jsonPath("$._embedded.caseResourceList[*]._links.self.href").value(containsInAnyOrder(containsString("/cases/2eef6095-06af-4c07-b989-795d64c86625"), containsString("/cases/b9a5ebc1-b77f-495d-9f28-5a181bf543bf"), containsString("/cases/f22a0d17-f8ba-44fb-b003-444124f6d1d3"))),
+                            jsonPath("$._embedded.cases.length()").value(3),
+                            jsonPath("$._embedded.cases[*].id").value(containsInAnyOrder("2eef6095-06af-4c07-b989-795d64c86625", "b9a5ebc1-b77f-495d-9f28-5a181bf543bf", "f22a0d17-f8ba-44fb-b003-444124f6d1d3")),
+                            jsonPath("$._embedded.cases[*].title").value(containsInAnyOrder("Case Title 1", "Case Title 2", "Case Title 3")),
+                            jsonPath("$._embedded.cases[*].description").value(containsInAnyOrder("Case 1 Description.", "Case 2 Description.", "Case 3 Description.")),
+                            jsonPath("$._embedded.cases[*].durationInSeconds").value(containsInAnyOrder(1800, 1900, 2000)),
+                            jsonPath("$._embedded.cases[*].user.id").value(containsInAnyOrder("157e4056-3a6e-4410-bc15-f14ea86887b6", "157e4056-3a6e-4410-bc15-f14ea86887b6", "157e4056-3a6e-4410-bc15-f14ea86887b6")),
+                            jsonPath("$._embedded.cases[*].user.username").value(containsInAnyOrder("user", "user", "user")),
+                            jsonPath("$._embedded.cases[*].user.email").value(containsInAnyOrder("user@example.com", "user@example.com", "user@example.com")),
+                            jsonPath("$._embedded.cases[*].user.firstName").value(containsInAnyOrder("First", "First", "First")),
+                            jsonPath("$._embedded.cases[*].user.lastName").value(containsInAnyOrder("Last", "Last", "Last")),
+                            jsonPath("$._embedded.cases[*].user.role").value(containsInAnyOrder("USER", "USER", "USER")),
+                            jsonPath("$._embedded.cases[*].createdAt").value(containsInAnyOrder("2024-05-16T00:00:01Z", "2024-05-16T00:00:02Z", "2024-05-16T00:00:03Z")),
+                            jsonPath("$._embedded.cases[*].updatedAt").value(containsInAnyOrder("2024-05-16T00:00:01Z", "2024-05-16T00:00:02Z", "2024-05-16T00:00:03Z")),
+                            jsonPath("$._embedded.cases[*]._links.self.href").value(containsInAnyOrder(containsString("/cases/2eef6095-06af-4c07-b989-795d64c86625"), containsString("/cases/b9a5ebc1-b77f-495d-9f28-5a181bf543bf"), containsString("/cases/f22a0d17-f8ba-44fb-b003-444124f6d1d3"))),
                             jsonPath("$._links.self.href").value(containsString("/cases")),
                             jsonPath("$.page.size").value(10),
                             jsonPath("$.page.totalElements").value(3),
                             jsonPath("$.page.totalPages").value(1),
+                            jsonPath("$.page.number").value(0));
+        }
+
+        @Test
+        void shouldReturnAppropriatePage() throws Exception {
+            generateCaseDummies(17);
+
+            mockMvc.perform(get("/cases?page=1")
+                            .with(jwt().jwt(jwt -> jwt
+                                    .claim("sub", "157e4056-3a6e-4410-bc15-f14ea86887b6")
+                                    .claim("scope", "USER"))))
+                    .andExpect(status().isOk())
+                    .andExpect(header().string(HttpHeaders.CONTENT_TYPE, "application/hal+json"))
+                    .andExpectAll(
+                            jsonPath("$._embedded.cases.length()").value(10),
+                            jsonPath("$.page.size").value(10),
+                            jsonPath("$.page.totalElements").value(20),
+                            jsonPath("$.page.totalPages").value(2),
+                            jsonPath("$.page.number").value(1));
+        }
+
+        @Test
+        void withSizeShouldReturnAppropriatePageSize() throws Exception {
+            generateCaseDummies(12);
+
+            mockMvc.perform(get("/cases?size=5")
+                            .with(jwt().jwt(jwt -> jwt
+                                    .claim("sub", "157e4056-3a6e-4410-bc15-f14ea86887b6")
+                                    .claim("scope", "USER"))))
+                    .andExpect(status().isOk())
+                    .andExpect(header().string(HttpHeaders.CONTENT_TYPE, "application/hal+json"))
+                    .andExpectAll(
+                            jsonPath("$._embedded.cases.length()").value(5),
+                            jsonPath("$.page.size").value(5),
+                            jsonPath("$.page.totalElements").value(15),
+                            jsonPath("$.page.totalPages").value(3),
                             jsonPath("$.page.number").value(0));
         }
     }
@@ -67,7 +113,10 @@ public class CaseControllerTest {
         void shouldReturnCase() throws Exception {
             var caseId = "2eef6095-06af-4c07-b989-795d64c86625";
 
-            mockMvc.perform(get("/cases/%s".formatted(caseId)))
+            mockMvc.perform(get("/cases/%s".formatted(caseId))
+                            .with(jwt().jwt(jwt -> jwt
+                                    .claim("sub", "157e4056-3a6e-4410-bc15-f14ea86887b6")
+                                    .claim("scope", "USER"))))
                     .andExpect(status().isOk())
                     .andExpect(header().string(HttpHeaders.CONTENT_TYPE, "application/hal+json"))
                     .andExpectAll(
@@ -75,6 +124,12 @@ public class CaseControllerTest {
                             jsonPath("$.title").value("Case Title 1"),
                             jsonPath("$.description").value("Case 1 Description."),
                             jsonPath("$.durationInSeconds").value(1800),
+                            jsonPath("$.user.id").value("157e4056-3a6e-4410-bc15-f14ea86887b6"),
+                            jsonPath("$.user.username").value("user"),
+                            jsonPath("$.user.email").value("user@example.com"),
+                            jsonPath("$.user.firstName").value("First"),
+                            jsonPath("$.user.lastName").value("Last"),
+                            jsonPath("$.user.role").value("USER"),
                             jsonPath("$.createdAt").value("2024-05-16T00:00:01Z"),
                             jsonPath("$.updatedAt").value("2024-05-16T00:00:01Z"),
                             jsonPath("$._links.self.href").value(containsString("/cases/2eef6095-06af-4c07-b989-795d64c86625")),
@@ -86,11 +141,26 @@ public class CaseControllerTest {
             String[] caseIds = {"17e3f075-4d00-4d70-ba24-68123777f0", "1", "CASE-001", "not-exists"};
 
             for (var caseId : caseIds) {
-                mockMvc.perform(get("/cases/%s".formatted(caseId)))
+                mockMvc.perform(get("/cases/%s".formatted(caseId))
+                                .with(jwt().jwt(jwt -> jwt
+                                        .claim("sub", "157e4056-3a6e-4410-bc15-f14ea86887b6")
+                                        .claim("scope", "USER"))))
                         .andExpect(status().isNotFound())
                         .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
                         .andExpect(jsonPath("$.errors").value("Cannot find Case with identity: %s".formatted(caseId)));
             }
+        }
+
+        @Test
+        void toUnathorizedCaseShouldReturnNotFound() throws Exception {
+            var caseId = "527fa3f0-449e-46f5-ac2a-ffd39e7e539f";
+
+            mockMvc.perform(get("/cases/%s".formatted(caseId))
+                            .with(jwt().jwt(jwt -> jwt
+                                    .claim("sub", "157e4056-3a6e-4410-bc15-f14ea86887b6")
+                                    .claim("scope", "USER"))))
+                    .andExpect(status().isNotFound())
+                    .andExpect(jsonPath("$.errors").value("Cannot find Case with identity: %s".formatted(caseId)));
         }
     }
 
@@ -108,6 +178,9 @@ public class CaseControllerTest {
                     """;
 
             mockMvc.perform(post("/cases")
+                            .with(jwt().jwt(jwt -> jwt
+                                    .claim("sub", "157e4056-3a6e-4410-bc15-f14ea86887b6")
+                                    .claim("scope", "USER")))
                             .contentType(MediaType.APPLICATION_JSON_VALUE)
                             .accept("application/hal+json")
                             .content(requestBody))
@@ -120,6 +193,12 @@ public class CaseControllerTest {
                             jsonPath("$.title").value(JsonPath.<String>read(requestBody, "$.title")),
                             jsonPath("$.description").value(JsonPath.<String>read(requestBody, "$.description")),
                             jsonPath("$.durationInSeconds").value(JsonPath.<String>read(requestBody, "$.durationInSeconds")),
+                            jsonPath("$.user.id").value("157e4056-3a6e-4410-bc15-f14ea86887b6"),
+                            jsonPath("$.user.username").value("user"),
+                            jsonPath("$.user.email").value("user@example.com"),
+                            jsonPath("$.user.firstName").value("First"),
+                            jsonPath("$.user.lastName").value("Last"),
+                            jsonPath("$.user.role").value("USER"),
                             jsonPath("$.createdAt", matchesPattern(Regexps.TIMESTAMP)),
                             jsonPath("$.updatedAt", matchesPattern(Regexps.TIMESTAMP)),
                             jsonPath("$._links.self.href", matchesPattern("^.*/cases/" + Regexps.UUID)),
@@ -144,6 +223,9 @@ public class CaseControllerTest {
                     """;
 
             mockMvc.perform(post("/cases")
+                            .with(jwt().jwt(jwt -> jwt
+                                    .claim("sub", "157e4056-3a6e-4410-bc15-f14ea86887b6")
+                                    .claim("scope", "USER")))
                             .contentType(MediaType.APPLICATION_JSON_VALUE)
                             .accept("application/hal+json")
                             .content(requestBody))
@@ -178,6 +260,9 @@ public class CaseControllerTest {
                     """;
 
             mockMvc.perform(put("/cases/%s".formatted(targetId))
+                            .with(jwt().jwt(jwt -> jwt
+                                    .claim("sub", "157e4056-3a6e-4410-bc15-f14ea86887b6")
+                                    .claim("scope", "USER")))
                             .contentType(MediaType.APPLICATION_JSON_VALUE)
                             .content(requestBody))
                     .andExpect(status().isNoContent());
@@ -203,6 +288,9 @@ public class CaseControllerTest {
                     """;
 
             mockMvc.perform(put("/cases/%s".formatted(targetId))
+                            .with(jwt().jwt(jwt -> jwt
+                                    .claim("sub", "157e4056-3a6e-4410-bc15-f14ea86887b6")
+                                    .claim("scope", "USER")))
                             .contentType(MediaType.APPLICATION_JSON_VALUE)
                             .content(requestBody))
                     .andExpect(status().isBadRequest())
@@ -226,12 +314,37 @@ public class CaseControllerTest {
 
             for (var caseId : caseIds) {
                 mockMvc.perform(put("/cases/%s".formatted(caseId))
+                                .with(jwt().jwt(jwt -> jwt
+                                        .claim("sub", "157e4056-3a6e-4410-bc15-f14ea86887b6")
+                                        .claim("scope", "USER")))
                                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                                 .content(requestBody))
                         .andExpect(status().isNotFound())
                         .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
                         .andExpect(jsonPath("$.errors").value("Cannot find Case with identity: %s".formatted(caseId)));
             }
+        }
+
+        @Test
+        void toUnauthorizedCaseShouldReturnNotFound() throws Exception {
+            var caseId = "527fa3f0-449e-46f5-ac2a-ffd39e7e539f";
+
+            var requestBody = """
+                    {
+                        "title": "Updated case Title 4",
+                        "description": "Updated case 4 Description.",
+                        "durationInSeconds": 2150
+                    }
+                    """;
+
+            mockMvc.perform(put("/cases/%s".formatted(caseId))
+                            .with(jwt().jwt(jwt -> jwt
+                                    .claim("sub", "157e4056-3a6e-4410-bc15-f14ea86887b6")
+                                    .claim("scope", "USER")))
+                            .contentType(MediaType.APPLICATION_JSON_VALUE)
+                            .content(requestBody))
+                    .andExpect(status().isNotFound())
+                    .andExpect(jsonPath("$.errors").value("Cannot find Case with identity: %s".formatted(caseId)));
         }
     }
 
@@ -242,7 +355,10 @@ public class CaseControllerTest {
 
         @Test
         void shouldReturnNoContentAndDisappearedOnDatabase() throws Exception {
-            mockMvc.perform(delete("/cases/%s".formatted(targetId)))
+            mockMvc.perform(delete("/cases/%s".formatted(targetId))
+                            .with(jwt().jwt(jwt -> jwt
+                                    .claim("sub", "157e4056-3a6e-4410-bc15-f14ea86887b6")
+                                    .claim("scope", "USER"))))
                     .andExpect(status().isNoContent());
 
             var count = jdbcTemplate.queryForObject("SELECT count(*) FROM cases WHERE id = ?", Integer.class, UUID.fromString(targetId));
@@ -255,10 +371,48 @@ public class CaseControllerTest {
             String[] caseIds = {"17e3f075-4d00-4d70-ba24-68123777f0", "1", "CASE-001", "not-exists"};
 
             for (var caseId : caseIds) {
-                mockMvc.perform(delete("/cases/%s".formatted(caseId)))
+                mockMvc.perform(delete("/cases/%s".formatted(caseId))
+                                .with(jwt().jwt(jwt -> jwt
+                                        .claim("sub", "157e4056-3a6e-4410-bc15-f14ea86887b6")
+                                        .claim("scope", "USER"))))
                         .andExpect(status().isNotFound());
             }
         }
+
+        @Test
+        void toUnauthorizedCaseShouldReturnNotFound() throws Exception {
+            var caseId = "527fa3f0-449e-46f5-ac2a-ffd39e7e539f";
+
+            mockMvc.perform(delete("/cases/%s".formatted(caseId))
+                            .with(jwt().jwt(jwt -> jwt
+                                    .claim("sub", "157e4056-3a6e-4410-bc15-f14ea86887b6")
+                                    .claim("scope", "USER"))))
+                    .andExpect(status().isNotFound())
+                    .andExpect(jsonPath("$.errors").value("Cannot find Case with identity: %s".formatted(caseId)));
+        }
+    }
+
+    private void generateCaseDummies(int count) {
+        List<Object> argList = new ArrayList<>();
+        var sqlBuilder = new StringBuilder("INSERT INTO cases (id, title, description, duration_in_seconds, user_id, created_at, updated_at) VALUES ");
+
+        for (int i = 0; i < count; i++) {
+            argList.add(UUID.randomUUID());
+            argList.add("Case Title 1%s".formatted(i));
+            argList.add("Case 1%d Description.".formatted(i));
+            argList.add(2000 + (i * 10));
+            argList.add(UUID.fromString("157e4056-3a6e-4410-bc15-f14ea86887b6"));
+            argList.add(new Timestamp(new Date().getTime()));
+            argList.add(new Timestamp(new Date().getTime()));
+
+            sqlBuilder.append("(?, ?, ?, ?, ?, ?, ?)");
+            sqlBuilder.append((i < count - 1) ? ", " : ";"); // Use semicolon at the end of the query
+        }
+
+        List<Object[]> batchArgs = new ArrayList<>();
+        batchArgs.add(argList.toArray());
+
+        jdbcTemplate.batchUpdate(sqlBuilder.toString(), batchArgs);
     }
 
 }

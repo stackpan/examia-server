@@ -12,6 +12,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
@@ -81,7 +82,7 @@ public class User implements Serializable, UserDetails {
         return true;
     }
 
-//    @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
-//    private List<Case> cases = new ArrayList<>();
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<Case> cases = new ArrayList<>();
 
 }

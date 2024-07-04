@@ -1,5 +1,6 @@
 package io.github.stackpan.examia.server.util;
 
+import io.github.stackpan.examia.server.exception.ResourceNotFoundException;
 import lombok.AllArgsConstructor;
 
 import java.util.UUID;
@@ -20,5 +21,13 @@ public class UUIDs {
         } catch (IllegalArgumentException ignored) {
             throw exceptionSupplier.get();
         }
+    }
+
+    public UUID orElseThrowsResourceNotFound(String resourceName) {
+        return orElseThrows(() -> new ResourceNotFoundException(resourceName, value));
+    }
+
+    public UUID orElseThrowsResourceNotFound(Class<?> resourceClass) {
+        return orElseThrows(() -> new ResourceNotFoundException(resourceClass.getSimpleName(), value));
     }
 }
