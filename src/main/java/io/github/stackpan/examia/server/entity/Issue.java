@@ -1,40 +1,39 @@
 package io.github.stackpan.examia.server.entity;
 
+import io.github.stackpan.examia.server.data.enums.IssueType;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.io.Serializable;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 @Entity
-@Table(name = "cases")
+@Table(name = "issues")
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-public class Case implements Serializable {
+public class Issue implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(columnDefinition = "uuid")
     private UUID id;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "user_id")
-    private User user;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "case_id")
+    private Case examiaCase;
 
-    @Column(length = 50, nullable = false)
-    private String title;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private IssueType type;
 
-    @Column(length = 500)
-    private String description;
-
-    @Column
-    private Integer durationInSeconds;
+    @Column(nullable = false)
+    private String body;
 
     @Column(columnDefinition = "timestamptz")
     @CreationTimestamp
@@ -43,11 +42,5 @@ public class Case implements Serializable {
     @Column(columnDefinition = "timestamptz")
     @UpdateTimestamp
     private Instant updatedAt;
-
-    @Column(nullable = false)
-    private boolean isSoftDeleted = false;
-
-    @OneToMany(mappedBy = "examiaCase", cascade = CascadeType.ALL)
-    private List<Issue> issues = new ArrayList<>();
 
 }
