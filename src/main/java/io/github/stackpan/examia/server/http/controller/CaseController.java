@@ -36,7 +36,7 @@ public class CaseController {
 
     @PostMapping
     public ResponseEntity<EntityModel<CaseResource>> createCase(@RequestBody @Valid CreateCaseRequest request, JwtAuthenticationToken jwt) {
-        var created = caseService.create(request);
+        var created = caseService.createByUserId(request, (String) jwt.getTokenAttributes().get("sub"));
 
         var caseModelAssembler = new CaseModelAssembler(jwt);
         var entityModel = caseModelAssembler.toModel(created);
@@ -48,22 +48,22 @@ public class CaseController {
 
     @GetMapping("/{caseId}")
     public EntityModel<CaseResource> getCase(@PathVariable String caseId, JwtAuthenticationToken jwt) {
-        var aCase = caseService.getById(caseId);
+        var aCase = caseService.getByCaseIdAndUserId(caseId, (String) jwt.getTokenAttributes().get("sub"));
 
         var caseModelAssembler = new CaseModelAssembler(jwt);
         return caseModelAssembler.toModel(aCase);
     }
 
     @PutMapping("/{caseId}")
-    public ResponseEntity<Void> updateCase(@PathVariable String caseId, @RequestBody @Valid UpdateCaseRequest request) {
-        caseService.updateById(caseId, request);
+    public ResponseEntity<Void> updateCase(@PathVariable String caseId, @RequestBody @Valid UpdateCaseRequest request, JwtAuthenticationToken jwt) {
+        caseService.updateByCaseIdAndUserId(caseId, (String) jwt.getTokenAttributes().get("sub"), request);
 
         return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/{caseId}")
-    public ResponseEntity<Void> deleteCase(@PathVariable String caseId) {
-        caseService.deleteById(caseId);
+    public ResponseEntity<Void> deleteCase(@PathVariable String caseId, JwtAuthenticationToken jwt) {
+        caseService.deleteByCaseIdAndUserId(caseId, (String) jwt.getTokenAttributes().get("sub"));
 
         return ResponseEntity.noContent().build();
     }

@@ -10,14 +10,12 @@ public interface CaseService {
 
     Page<Case> getAllByUserId(Pageable pageable, String userId);
 
-    Page<Case> getAll(Pageable pageable);
+    Case getByCaseIdAndUserId(String caseId, String userId);
 
-    Case getById(String id);
+    Case createByUserId(CreateCaseRequest data, String userId);
 
-    Case create(CreateCaseRequest model);
+    void updateByCaseIdAndUserId(String caseId, String userId, UpdateCaseRequest model);
 
-    void updateById(String id, UpdateCaseRequest model);
-
-    void deleteById(String id);
+    void deleteByCaseIdAndUserId(String caseId, String userId);
 
 }

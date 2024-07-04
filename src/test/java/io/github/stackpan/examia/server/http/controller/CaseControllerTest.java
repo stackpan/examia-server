@@ -150,6 +150,18 @@ public class CaseControllerTest {
                         .andExpect(jsonPath("$.errors").value("Cannot find Case with identity: %s".formatted(caseId)));
             }
         }
+
+        @Test
+        void toUnathorizedCaseShouldReturnNotFound() throws Exception {
+            var caseId = "527fa3f0-449e-46f5-ac2a-ffd39e7e539f";
+
+            mockMvc.perform(get("/cases/%s".formatted(caseId))
+                            .with(jwt().jwt(jwt -> jwt
+                                    .claim("sub", "157e4056-3a6e-4410-bc15-f14ea86887b6")
+                                    .claim("scope", "USER"))))
+                    .andExpect(status().isNotFound())
+                    .andExpect(jsonPath("$.errors").value("Cannot find Case with identity: %s".formatted(caseId)));
+        }
     }
 
     @Nested
@@ -312,6 +324,28 @@ public class CaseControllerTest {
                         .andExpect(jsonPath("$.errors").value("Cannot find Case with identity: %s".formatted(caseId)));
             }
         }
+
+        @Test
+        void toUnauthorizedCaseShouldReturnNotFound() throws Exception {
+            var caseId = "527fa3f0-449e-46f5-ac2a-ffd39e7e539f";
+
+            var requestBody = """
+                    {
+                        "title": "Updated case Title 4",
+                        "description": "Updated case 4 Description.",
+                        "durationInSeconds": 2150
+                    }
+                    """;
+
+            mockMvc.perform(put("/cases/%s".formatted(caseId))
+                            .with(jwt().jwt(jwt -> jwt
+                                    .claim("sub", "157e4056-3a6e-4410-bc15-f14ea86887b6")
+                                    .claim("scope", "USER")))
+                            .contentType(MediaType.APPLICATION_JSON_VALUE)
+                            .content(requestBody))
+                    .andExpect(status().isNotFound())
+                    .andExpect(jsonPath("$.errors").value("Cannot find Case with identity: %s".formatted(caseId)));
+        }
     }
 
     @Nested
@@ -343,6 +377,18 @@ public class CaseControllerTest {
                                         .claim("scope", "USER"))))
                         .andExpect(status().isNotFound());
             }
+        }
+
+        @Test
+        void toUnauthorizedCaseShouldReturnNotFound() throws Exception {
+            var caseId = "527fa3f0-449e-46f5-ac2a-ffd39e7e539f";
+
+            mockMvc.perform(delete("/cases/%s".formatted(caseId))
+                            .with(jwt().jwt(jwt -> jwt
+                                    .claim("sub", "157e4056-3a6e-4410-bc15-f14ea86887b6")
+                                    .claim("scope", "USER"))))
+                    .andExpect(status().isNotFound())
+                    .andExpect(jsonPath("$.errors").value("Cannot find Case with identity: %s".formatted(caseId)));
         }
     }
 
