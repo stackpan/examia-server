@@ -18,8 +18,6 @@ public class IssueResource extends RepresentationModel<IssueResource> {
 
     UUID id;
 
-    Long sequence;
-
     IssueType type;
 
     String body;
@@ -31,7 +29,6 @@ public class IssueResource extends RepresentationModel<IssueResource> {
     public static IssueResource fromEntity(Issue entity) {
         return new IssueResource(
                 entity.getId(),
-                entity.getSequence(),
                 entity.getType(),
                 entity.getBody(),
                 entity.getCreatedAt().atOffset(ZoneOffset.UTC),

@@ -49,7 +49,6 @@ public class IssueControllerTest {
                                     "8a12c2ed-747e-489c-ad01-32ca95932bc7",
                                     "f1fbc220-585b-422a-91bd-141378f07e38"
                             )),
-                            jsonPath("$._embedded.issues[*].sequence").value(contains(1, 2, 3)),
                             jsonPath("$._embedded.issues[*].type").value(contains(
                                     "SINGLE_CHOICE",
                                     "MULTIPLE_CHOICE",

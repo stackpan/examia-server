@@ -28,8 +28,6 @@ public class Issue implements Serializable {
     @JoinColumn(name = "case_id")
     private Case examiaCase;
 
-    private Long sequence;
-
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private IssueType type;

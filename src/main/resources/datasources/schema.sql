@@ -35,12 +35,10 @@ CREATE TABLE IF NOT EXISTS issues
 (
     id         UUID      NOT NULL PRIMARY KEY,
     case_id    UUID      NOT NULL REFERENCES cases (id),
-    sequence   BIGINT    NOT NULL,
     type       ISSUETYPE NOT NULL,
     body       TEXT      NOT NULL,
     created_at TIMESTAMPTZ,
-    updated_at TIMESTAMPTZ,
-    CONSTRAINT key_issues_case_id_sequence UNIQUE (case_id, sequence)
+    updated_at TIMESTAMPTZ
 );
 
 CREATE TABLE IF NOT EXISTS choices
