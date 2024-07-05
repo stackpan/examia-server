@@ -27,11 +27,7 @@ public class IssueController {
     private final PagedResourcesAssembler<Issue> pagedResourcesAssembler;
 
     @GetMapping
-    public PagedModel<EntityModel<IssueResource>> listIssues(
-            @PathVariable String caseId,
-            @PageableDefault(sort = "sequence") Pageable pageable,
-            JwtAuthenticationToken jwt
-    ) {
+    public PagedModel<EntityModel<IssueResource>> listIssues(@PathVariable String caseId, @PageableDefault Pageable pageable, JwtAuthenticationToken jwt) {
         var issuePage = issueService.getPaginatedByCaseId(caseId, pageable, (String) jwt.getTokenAttributes().get("sub"));
 
         return pagedResourcesAssembler.toModel(issuePage, new IssueModelAssembler(jwt));

@@ -1,6 +1,6 @@
 TRUNCATE TABLE issues RESTART IDENTITY CASCADE;
 
-INSERT INTO issues (id, case_id, sequence, type, body, created_at, updated_at)
+INSERT INTO issues (id, case_id, type, body, created_at, updated_at)
 VALUES ('e7576fb6-c4f3-4b73-b9d9-0e1e67ac91d5', '2eef6095-06af-4c07-b989-795d64c86625', 'SINGLE_CHOICE',
         'porttitor lorem id ligula suspendisse ornare', '2024-07-05 00:00:01.000000 +00:00',
         '2024-07-05 00:00:01.000000 +00:00'),
